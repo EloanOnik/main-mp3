@@ -6,7 +6,6 @@ class MP3Player {
         this.isPlaying = false;
         this.shuffleMode = false;
         this.repeatMode = false;
-        this.preloadedImages = new Map(); // Кеширование загруженных изображений
         
         // Элементы DOM
         this.elements = {
@@ -30,7 +29,7 @@ class MP3Player {
         this.init();
     }
     
-    async init() {
+    init() {
         this.playlist = [
             {
                 title: "Посетитель снов",
@@ -46,10 +45,8 @@ class MP3Player {
                 cover: "./tracks/track2/Не лечи.png",
                 duration: "2:25"
             },
+            
         ];
-        
-        // Предзагрузка всех обложек
-        await this.preloadAllCovers();
         
         // Инициализация событий
         this.bindEvents();
@@ -63,66 +60,20 @@ class MP3Player {
         // Установка громкости
         this.audio.volume = this.elements.volumeSlider.value;
         
-        // Инициализация фона (ОДИН РАЗ при загрузке)
+        // Инициализация фона (размытие)
         this.initBackground();
     }
     
-    // ОПТИМИЗАЦИЯ: Предзагрузка всех обложек
-    async preloadAllCovers() {
-        const preloadPromises = this.playlist.map((track, index) => {
-            return new Promise((resolve) => {
-                if (track.cover) {
-                    const img = new Image();
-                    img.onload = () => {
-                        this.preloadedImages.set(track.cover, img);
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        console.warn(`Не удалось загрузить обложку: ${track.cover}`);
-                        resolve();
-                    };
-                    img.src = track.cover;
-                } else {
-                    resolve();
-                }
-            });
-        });
-        
-        await Promise.all(preloadPromises);
-    }
-    
-    // ОПТИМИЗАЦИЯ: Инициализация фона один раз
+    // НОВЫЙ МЕТОД: Инициализация фона с размытием
     initBackground() {
-        // Создаем ДВА слоя для плавного перехода
-        const createBackgroundLayer = (id, zIndex) => {
-            const layer = document.createElement('div');
-            layer.id = id;
-            layer.className = 'background-layer';
-            layer.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
-                z-index: ${zIndex};
-                pointer-events: none;
-                transition: opacity 0.5s ease;
-                opacity: 0;
-            `;
-            return layer;
-        };
+        // Удаляем старые оверлеи если есть
+        const oldOverlay = document.getElementById('blur-overlay');
+        if (oldOverlay) oldOverlay.remove();
         
-        // Слой 1 - текущий фон
-        this.bgLayer1 = createBackgroundLayer('bg-layer-1', -2);
+        const oldDarkOverlay = document.getElementById('dark-overlay');
+        if (oldDarkOverlay) oldDarkOverlay.remove();
         
-        // Слой 2 - следующий фон (для перехода)
-        this.bgLayer2 = createBackgroundLayer('bg-layer-2', -3);
-        
-        // Слой размытия (один на все время)
+        // Создаем размытый оверлей
         const blurOverlay = document.createElement('div');
         blurOverlay.id = 'blur-overlay';
         blurOverlay.style.cssText = `
@@ -131,136 +82,138 @@ class MP3Player {
             left: 0;
             width: 100%;
             height: 100%;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            background: rgba(0, 0, 0, 0.15);
+            z-index: -1;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        `;
+        document.body.appendChild(blurOverlay);
+        
+        // Создаем темный оверлей для контраста
+        const darkOverlay = document.createElement('div');
+        darkOverlay.id = 'dark-overlay';
+        darkOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.2);
             z-index: -1;
             pointer-events: none;
+            transition: opacity 0.8s ease;
         `;
+        document.body.appendChild(darkOverlay);
         
-        // Добавляем все слои
-        document.body.appendChild(this.bgLayer1);
-        document.body.appendChild(this.bgLayer2);
-        document.body.appendChild(blurOverlay);
-        
-        // Устанавливаем начальный фон
+        // Устанавливаем начальный фон (первый трек)
         if (this.playlist.length > 0) {
-            this.setBackgroundImage(this.playlist[0].cover);
+            this.updateBackground(this.playlist[0].cover);
         }
     }
     
-    // ОПТИМИЗАЦИЯ: Быстрая смена фона
-    setBackgroundImage(imageUrl, instant = false) {
-        // Если изображение уже в кеше - используем его
-        if (this.preloadedImages.has(imageUrl)) {
-            const img = this.preloadedImages.get(imageUrl);
+    // НОВЫЙ МЕТОД: Обновление фона с анимацией
+    updateBackground(imageUrl) {
+        // Плавно скрываем старый фон
+        const blurOverlay = document.getElementById('blur-overlay');
+        const darkOverlay = document.getElementById('dark-overlay');
+        
+        if (blurOverlay) blurOverlay.style.opacity = '0.7';
+        if (darkOverlay) darkOverlay.style.opacity = '0.8';
+        
+        // Создаем временный элемент для предзагрузки
+        const img = new Image();
+        img.src = imageUrl;
+        
+        img.onload = () => {
+            // Устанавливаем новое фоновое изображение
+            document.body.style.backgroundImage = `url('${imageUrl}')`;
+            document.body.style.backgroundRepeat = 'no-repeat';
+            document.body.style.backgroundPosition = 'center center';
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundAttachment = 'fixed';
+            document.body.style.transition = 'background-image 0.8s ease-in-out';
             
-            // Создаем временный canvas для более быстрой отрисовки
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            
-            // Используем canvas для фона (быстрее чем img.src)
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            
-            if (instant) {
-                // Мгновенная замена (для первого трека)
-                this.bgLayer1.style.backgroundImage = `url('${dataUrl}')`;
-                this.bgLayer1.style.opacity = '1';
-                this.bgLayer2.style.opacity = '0';
-            } else {
-                // Плавный переход
-                if (this.bgLayer1.style.opacity === '1') {
-                    // bgLayer1 активен, меняем на bgLayer2
-                    this.bgLayer2.style.backgroundImage = `url('${dataUrl}')`;
-                    this.bgLayer2.style.opacity = '1';
-                    this.bgLayer1.style.opacity = '0';
-                } else {
-                    // bgLayer2 активен, меняем на bgLayer1
-                    this.bgLayer1.style.backgroundImage = `url('${dataUrl}')`;
-                    this.bgLayer1.style.opacity = '1';
-                    this.bgLayer2.style.opacity = '0';
+            // Плавно показываем оверлеи
+            setTimeout(() => {
+                if (blurOverlay) {
+                    blurOverlay.style.opacity = '1';
+                    blurOverlay.style.backdropFilter = 'blur(25px)';
+                    blurOverlay.style.webkitBackdropFilter = 'blur(25px)';
                 }
-            }
-            
-            // Освобождаем память
-            canvas.width = 0;
-            canvas.height = 0;
-        } else {
-            // Если нет в кеше - загружаем обычным способом
-            const img = new Image();
-            img.onload = () => {
-                if (instant) {
-                    this.bgLayer1.style.backgroundImage = `url('${imageUrl}')`;
-                    this.bgLayer1.style.opacity = '1';
-                } else {
-                    if (this.bgLayer1.style.opacity === '1') {
-                        this.bgLayer2.style.backgroundImage = `url('${imageUrl}')`;
-                        this.bgLayer2.style.opacity = '1';
-                        this.bgLayer1.style.opacity = '0';
-                    } else {
-                        this.bgLayer1.style.backgroundImage = `url('${imageUrl}')`;
-                        this.bgLayer1.style.opacity = '1';
-                        this.bgLayer2.style.opacity = '0';
-                    }
-                }
-            };
-            img.src = imageUrl;
-        }
+                if (darkOverlay) darkOverlay.style.opacity = '1';
+            }, 100);
+        };
+        
+        img.onerror = () => {
+            console.warn('Не удалось загрузить изображение для фона:', imageUrl);
+            // Устанавливаем запасной фон
+            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        };
     }
     
     bindEvents() {
-        // Упрощенный вариант обработчиков - удалены тяжелые операции
+        // Кнопки управления
         this.elements.playBtn.addEventListener('click', () => this.play());
         this.elements.pauseBtn.addEventListener('click', () => this.pause());
         this.elements.prevBtn.addEventListener('click', () => this.prev());
         this.elements.nextBtn.addEventListener('click', () => this.next());
         
+        // Громкость
         this.elements.volumeSlider.addEventListener('input', (e) => {
             this.audio.volume = e.target.value;
         });
         
-        // ОПТИМИЗАЦИЯ: Упрощенный обработчик прогресса
-        let progressTimeout;
+        // Прогресс трека
         this.elements.progressContainer.addEventListener('click', (e) => {
-            const rect = this.elements.progressContainer.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
+            const width = this.elements.progressContainer.clientWidth;
+            const clickX = e.offsetX;
+            const duration = this.audio.duration;
             
-            if (this.audio.duration) {
-                this.audio.currentTime = percent * this.audio.duration;
+            if (duration && !isNaN(duration)) {
+                this.audio.currentTime = (clickX / width) * duration;
+                this.updateProgress();
             }
         });
         
-        // Оптимизация: реже обновляем UI
-        this.audio.addEventListener('timeupdate', () => {
-            if (!progressTimeout) {
-                progressTimeout = setTimeout(() => {
-                    this.updateProgress();
-                    progressTimeout = null;
-                }, 50); // Обновляем каждые 50мс вместо каждого кадра
+        // Перетаскивание прогресс-бара
+        let isDragging = false;
+        this.elements.progressContainer.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && this.elements.progressContainer.contains(e.target)) {
+                const width = this.elements.progressContainer.clientWidth;
+                const rect = this.elements.progressContainer.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const duration = this.audio.duration;
+                
+                if (duration && !isNaN(duration)) {
+                    const newTime = (clickX / width) * duration;
+                    if (newTime >= 0 && newTime <= duration) {
+                        this.audio.currentTime = newTime;
+                        this.updateProgress();
+                    }
+                }
             }
         });
+        document.addEventListener('mouseup', () => isDragging = false);
         
+        // События аудио
+        this.audio.addEventListener('timeupdate', () => this.updateProgress());
         this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
         this.audio.addEventListener('ended', () => this.next());
-        
         this.audio.addEventListener('error', (e) => {
-            console.error('Ошибка аудио:', e);
-            this.updateStatus("Ошибка загрузки трека");
+            console.error('Ошибка загрузки аудио:', e);
+            this.updateStatus("Ошибка загрузки трека. Проверьте ссылку на файл.");
         });
     }
     
-    // ОПТИМИЗАЦИЯ: Более быстрый рендеринг плейлиста
     renderPlaylist() {
-        // Используем DocumentFragment для массовой вставки
-        const fragment = document.createDocumentFragment();
+        this.elements.playlistEl.innerHTML = '';
         
         this.playlist.forEach((track, index) => {
             const li = document.createElement('li');
             
-            // Минимальный HTML
             li.innerHTML = `
                 <div class="track-info">
                     <div class="track-title">${track.title}</div>
@@ -269,69 +222,55 @@ class MP3Player {
                 <div class="track-duration">${track.duration || '--:--'}</div>
             `;
             
-            // Делегирование событий на уровне плейлиста
-            li.dataset.index = index;
+            li.addEventListener('click', () => {
+                this.loadTrack(index);
+                this.play();
+            });
             
             if (index === this.currentTrackIndex) {
                 li.classList.add('active');
             }
             
-            fragment.appendChild(li);
-        });
-        
-        this.elements.playlistEl.innerHTML = '';
-        this.elements.playlistEl.appendChild(fragment);
-        
-        // Один обработчик на весь плейлист
-        this.elements.playlistEl.addEventListener('click', (e) => {
-            const li = e.target.closest('li');
-            if (li && li.dataset.index) {
-                const index = parseInt(li.dataset.index);
-                this.loadTrack(index);
-                this.play();
-            }
+            this.elements.playlistEl.appendChild(li);
         });
     }
     
-    // ОПТИМИЗАЦИЯ: Быстрая загрузка трека
     loadTrack(index) {
         if (index >= 0 && index < this.playlist.length) {
             this.currentTrackIndex = index;
             const track = this.playlist[index];
             
-            // ОПТИМИЗАЦИЯ: Минимальные DOM операции
-            this.audio.src = track.src;
-            this.elements.currentSongEl.textContent = track.title;
-            this.elements.currentArtistEl.textContent = track.artist;
-            
-            // ОПТИМИЗАЦИЯ: Обложка в плеере
-            if (track.cover && this.elements.coverImage) {
-                // Используем кешированное изображение если есть
-                if (this.preloadedImages.has(track.cover)) {
-                    this.elements.coverImage.src = this.preloadedImages.get(track.cover).src;
-                } else {
+            try {
+                this.audio.src = track.src;
+                this.elements.currentSongEl.textContent = track.title;
+                this.elements.currentArtistEl.textContent = track.artist;
+                
+                // Устанавливаем обложку в плеере
+                if (track.cover && this.elements.coverImage) {
                     this.elements.coverImage.src = track.cover;
+                    this.elements.coverImage.alt = `${track.title} - ${track.artist}`;
                 }
-            }
-            
-            // ОПТИМИЗАЦИЯ: Быстрая смена фона
-            if (track.cover) {
-                this.setBackgroundImage(track.cover);
-            }
-            
-            // ОПТИМИЗАЦИЯ: Быстрое обновление активного элемента
-            const items = this.elements.playlistEl.querySelectorAll('li');
-            items.forEach((item, i) => {
-                if (i === index) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
+                
+                // ОБНОВЛЯЕМ ФОН С РАЗМЫТИЕМ
+                if (track.cover) {
+                    this.updateBackground(track.cover);
                 }
-            });
-            
-            // Автовоспроизведение если уже играло
-            if (this.isPlaying) {
-                this.audio.play().catch(e => console.log('Автовоспроизведение отключено'));
+                
+                // Обновление активного элемента в плейлисте
+                const items = this.elements.playlistEl.querySelectorAll('li');
+                items.forEach((item, i) => {
+                    item.classList.toggle('active', i === index);
+                });
+                
+                // Если был воспроизведение, продолжаем
+                if (this.isPlaying) {
+                    this.play();
+                }
+                
+                this.updateStatus(`Загружен: ${track.title} - ${track.artist}`);
+            } catch (error) {
+                console.error('Ошибка загрузки трека:', error);
+                this.updateStatus(`Ошибка загрузки: ${track.title}`);
             }
         }
     }
@@ -343,9 +282,11 @@ class MP3Player {
                 this.elements.playBtn.style.display = 'none';
                 this.elements.pauseBtn.style.display = 'flex';
                 this.elements.albumCover.classList.add('playing');
+                this.updateStatus("Воспроизведение...");
             })
             .catch(error => {
                 console.error('Ошибка воспроизведения:', error);
+                this.updateStatus("Ошибка воспроизведения. Проверьте доступ к аудио файлу.");
             });
     }
     
@@ -355,32 +296,43 @@ class MP3Player {
         this.elements.playBtn.style.display = 'flex';
         this.elements.pauseBtn.style.display = 'none';
         this.elements.albumCover.classList.remove('playing');
+        this.updateStatus("Пауза");
     }
     
     prev() {
         let newIndex = this.currentTrackIndex - 1;
-        if (newIndex < 0) newIndex = this.playlist.length - 1;
+        if (newIndex < 0) {
+            newIndex = this.playlist.length - 1; // Зацикливание
+        }
         this.loadTrack(newIndex);
-        if (this.isPlaying) this.audio.play();
+        if (this.isPlaying) {
+            this.play();
+        }
     }
     
     next() {
         let newIndex = this.currentTrackIndex + 1;
-        if (newIndex >= this.playlist.length) newIndex = 0;
+        if (newIndex >= this.playlist.length) {
+            newIndex = 0; // Зацикливание
+        }
         this.loadTrack(newIndex);
-        if (this.isPlaying) this.audio.play();
+        if (this.isPlaying) {
+            this.play();
+        }
     }
     
     updateProgress() {
-        if (this.audio.duration) {
+        if (this.audio.duration && !isNaN(this.audio.duration)) {
             const percent = (this.audio.currentTime / this.audio.duration) * 100;
             this.elements.progressBar.style.width = `${percent}%`;
+            
+            // Обновление времени
             this.elements.currentTimeEl.textContent = this.formatTime(this.audio.currentTime);
         }
     }
     
     updateDuration() {
-        if (this.audio.duration) {
+        if (this.audio.duration && !isNaN(this.audio.duration)) {
             this.elements.durationEl.textContent = this.formatTime(this.audio.duration);
         }
     }
@@ -394,41 +346,76 @@ class MP3Player {
     updateStatus(message) {
         if (this.elements.statusMessage) {
             this.elements.statusMessage.textContent = message;
-            // Автоматически скрываем через 2 секунды
-            setTimeout(() => {
-                this.elements.statusMessage.textContent = '';
-            }, 2000);
         }
     }
     
-    // Оптимизированное добавление трека
-    async addTrack(track) {
+    // Метод для добавления треков динамически
+    addTrack(track) {
         this.playlist.push(track);
+        this.renderPlaylist();
+        this.updateStatus(`Добавлен трек: ${track.title}`);
         
-        // Предзагрузка обложки
-        if (track.cover) {
-            await new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    this.preloadedImages.set(track.cover, img);
-                    resolve();
-                };
-                img.onerror = resolve;
-                img.src = track.cover;
-            });
+        // Если это первый трек, обновляем фон
+        if (this.playlist.length === 1) {
+            this.updateBackground(track.cover);
         }
+    }
+    
+    // Метод для загрузки локальных файлов
+    loadLocalFiles(filePaths) {
+        filePaths.forEach((path, index) => {
+            this.addTrack({
+                title: `Локальный файл ${index + 1}`,
+                artist: "Пользователь",
+                src: path,
+                cover: "./default-cover.jpg" // Добавьте картинку по умолчанию
+            });
+        });
         
-        // Перерендерим плейлист только если он видим
-        if (this.elements.playlistEl.offsetParent !== null) {
-            this.renderPlaylist();
+        if (this.playlist.length > 0 && !this.audio.src) {
+            this.loadTrack(0);
+        }
+    }
+    
+    // НОВЫЙ МЕТОД: Изменение интенсивности размытия
+    setBlurIntensity(intensity) {
+        const blurOverlay = document.getElementById('blur-overlay');
+        if (blurOverlay) {
+            blurOverlay.style.backdropFilter = `blur(${intensity}px)`;
+            blurOverlay.style.webkitBackdropFilter = `blur(${intensity}px)`;
+        }
+    }
+    
+    // НОВЫЙ МЕТОД: Изменение прозрачности темного оверлея
+    setDarkness(opacity) {
+        const darkOverlay = document.getElementById('dark-overlay');
+        if (darkOverlay) {
+            darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
         }
     }
 }
 
-// Быстрая инициализация
+// Инициализация плеера при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    // Не блокируем основной поток
-    setTimeout(() => {
-        window.player = new MP3Player();
-    }, 100);
+    const player = new MP3Player();
+    window.player = player; // Для отладки
+    
+    // Дополнительные треки для примера (раскомментируйте и настройте)
+    /*
+    player.addTrack({
+        title: "Название трека 2",
+        artist: "Исполнитель 2",
+        src: "./tracks/track2/song2.mp3",
+        cover: "./tracks/track2/cover2.png",
+        duration: "2:30"
+    });
+    
+    player.addTrack({
+        title: "Название трека 3",
+        artist: "Исполнитель 3",
+        src: "./tracks/track3/song3.mp3",
+        cover: "./tracks/track3/cover3.jpg",
+        duration: "3:15"
+    });
+    */
 });
