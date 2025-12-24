@@ -7,7 +7,7 @@ class MP3Player {
         this.shuffleMode = false;
         this.repeatMode = false;
         
-        // Элементы DOM (УБИРАЕМ volumeSlider)
+        // Элементы DOM
         this.elements = {
             playBtn: document.getElementById('play-btn'),
             pauseBtn: document.getElementById('pause-btn'),
@@ -54,7 +54,7 @@ class MP3Player {
         // Загрузка первого трека
         this.loadTrack(0);
         
-        // Устанавливаем фиксированную громкость (например, 70%)
+        // Устанавливаем фиксированную громкость
         this.audio.volume = 0.7;
         
         // Инициализация фона
@@ -62,78 +62,128 @@ class MP3Player {
     }
     
     initBackground() {
-        // Удаляем старые оверлеи если есть
-        const oldOverlay = document.getElementById('blur-overlay');
-        if (oldOverlay) oldOverlay.remove();
+        // УДАЛЯЕМ ВСЕ СТАРЫЕ СЛОИ
+        const oldLayers = document.querySelectorAll('#bg-layer, #blur-layer, #bg-layer-1, #bg-layer-2');
+        oldLayers.forEach(layer => layer.remove());
         
-        const oldDarkOverlay = document.getElementById('dark-overlay');
-        if (oldDarkOverlay) oldDarkOverlay.remove();
-        
-        // Создаем размытый оверлей
-        const blurOverlay = document.createElement('div');
-        blurOverlay.id = 'blur-overlay';
-        blurOverlay.style.cssText = `
+        // Создаем ДВА слоя для плавного перехода
+        const bgLayer1 = document.createElement('div');
+        bgLayer1.id = 'bg-layer-1';
+        bgLayer1.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            background: rgba(0, 0, 0, 0.15);
-            z-index: -1;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            opacity: 1;
+            transition: opacity 0.8s ease-in-out;
+            z-index: -2;
             pointer-events: none;
-            transition: opacity 0.8s ease;
         `;
-        document.body.appendChild(blurOverlay);
         
-        // Создаем темный оверлей для контраста
-        const darkOverlay = document.createElement('div');
-        darkOverlay.id = 'dark-overlay';
-        darkOverlay.style.cssText = `
+        const bgLayer2 = document.createElement('div');
+        bgLayer2.id = 'bg-layer-2';
+        bgLayer2.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            z-index: -2;
+            pointer-events: none;
+        `;
+        
+        // Слой размытия
+        const blurLayer = document.createElement('div');
+        blurLayer.id = 'blur-layer';
+        blurLayer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.25);
             z-index: -1;
             pointer-events: none;
-            transition: opacity 0.8s ease;
         `;
-        document.body.appendChild(darkOverlay);
         
-        // Устанавливаем начальный фон (первый трек)
+        // Добавляем слои
+        document.body.appendChild(bgLayer1);
+        document.body.appendChild(bgLayer2);
+        document.body.appendChild(blurLayer);
+        
+        // Устанавливаем стили для body
+        document.body.style.cssText = `
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        `;
+        
+        // Устанавливаем начальный фон
         if (this.playlist.length > 0) {
-            this.updateBackground(this.playlist[0].cover);
+            const img = new Image();
+            img.onload = () => {
+                bgLayer1.style.backgroundImage = `url('${this.playlist[0].cover}')`;
+            };
+            img.src = this.playlist[0].cover;
         }
     }
     
+    // ПРОСТОЙ метод для смены фона с плавным переходом
     updateBackground(imageUrl) {
-        // Плавно скрываем старый фон
-        const blurOverlay = document.getElementById('blur-overlay');
-        const darkOverlay = document.getElementById('dark-overlay');
+        const bgLayer1 = document.getElementById('bg-layer-1');
+        const bgLayer2 = document.getElementById('bg-layer-2');
         
-        if (blurOverlay) blurOverlay.style.opacity = '0.7';
-        if (darkOverlay) darkOverlay.style.opacity = '0.8';
+        if (!bgLayer1 || !bgLayer2) {
+            // Если слоев нет - создаем их
+            this.initBackground();
+            return;
+        }
         
-        // Устанавливаем новое фоновое изображение
-        document.body.style.backgroundImage = `url('${imageUrl}')`;
-        document.body.style.backgroundRepeat = 'no-repeat';
-        document.body.style.backgroundPosition = 'center center';
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundAttachment = 'fixed';
-        document.body.style.transition = 'background-image 0.8s ease-in-out';
+        // Предзагрузка изображения
+        const img = new Image();
         
-        // Плавно показываем оверлеи
-        setTimeout(() => {
-            if (blurOverlay) {
-                blurOverlay.style.opacity = '1';
-                blurOverlay.style.backdropFilter = 'blur(25px)';
-                blurOverlay.style.webkitBackdropFilter = 'blur(25px)';
-            }
-            if (darkOverlay) darkOverlay.style.opacity = '1';
-        }, 100);
+        img.onload = () => {
+            // Определяем какой слой активен сейчас
+            const activeLayer = bgLayer1.style.opacity === '1' ? bgLayer1 : bgLayer2;
+            const inactiveLayer = activeLayer === bgLayer1 ? bgLayer2 : bgLayer1;
+            
+            // Устанавливаем новое изображение на неактивный слой
+            inactiveLayer.style.backgroundImage = `url('${imageUrl}')`;
+            
+            // Плавно показываем неактивный слой и скрываем активный
+            setTimeout(() => {
+                inactiveLayer.style.opacity = '1';
+                activeLayer.style.opacity = '0';
+            }, 10);
+        };
+        
+        img.onerror = () => {
+            console.warn('Не удалось загрузить фон:', imageUrl);
+            // Устанавливаем градиент
+            const activeLayer = bgLayer1.style.opacity === '1' ? bgLayer1 : bgLayer2;
+            activeLayer.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        };
+        
+        img.src = imageUrl;
     }
     
     bindEvents() {
@@ -159,6 +209,22 @@ class MP3Player {
         this.audio.addEventListener('timeupdate', () => this.updateProgress());
         this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
         this.audio.addEventListener('ended', () => this.next());
+        
+        // Восстановление фона
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.restoreBackground();
+            }
+        });
+    }
+    
+    // Упрощенный метод восстановления фона
+    restoreBackground() {
+        const currentTrack = this.playlist[this.currentTrackIndex];
+        if (currentTrack && currentTrack.cover) {
+            // Просто обновляем фон
+            this.updateBackground(currentTrack.cover);
+        }
     }
     
     renderPlaylist() {
@@ -204,7 +270,7 @@ class MP3Player {
                     this.elements.coverImage.alt = `${track.title} - ${track.artist}`;
                 }
                 
-                // ОБНОВЛЯЕМ ФОН С РАЗМЫТИЕМ
+                // ОБНОВЛЯЕМ ФОН С ПЛАВНЫМ ПЕРЕХОДОМ
                 if (track.cover) {
                     this.updateBackground(track.cover);
                 }
@@ -291,14 +357,13 @@ class MP3Player {
         return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
     
-    // Метод для добавления треков динамически
     addTrack(track) {
         this.playlist.push(track);
         this.renderPlaylist();
     }
 }
 
-// Инициализация плеера при загрузке страницы
+// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
     const player = new MP3Player();
     window.player = player;
