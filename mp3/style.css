@@ -216,16 +216,6 @@ body {
     color: #999;
 }
 
-.status-message {
-    text-align: center;
-    padding: 15px;
-    color: #666;
-    font-style: italic;
-    background: #f8f9fa;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
 @media (max-width: 480px) {
     .player {
         padding: 20px;

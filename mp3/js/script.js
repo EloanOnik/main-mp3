@@ -22,7 +22,6 @@ class MP3Player {
             playlistEl: document.getElementById('playlist'),
             coverImage: document.getElementById('cover-image'),
             albumCover: document.getElementById('album-cover'),
-            statusMessage: document.getElementById('status-message')
         };
         
         this.init();
@@ -160,10 +159,6 @@ class MP3Player {
         this.audio.addEventListener('timeupdate', () => this.updateProgress());
         this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
         this.audio.addEventListener('ended', () => this.next());
-        this.audio.addEventListener('error', (e) => {
-            console.error('Ошибка загрузки аудио:', e);
-            this.updateStatus("Ошибка загрузки трека. Проверьте ссылку на файл.");
-        });
     }
     
     renderPlaylist() {
@@ -225,10 +220,8 @@ class MP3Player {
                     this.play();
                 }
                 
-                this.updateStatus(`Загружен: ${track.title} - ${track.artist}`);
             } catch (error) {
                 console.error('Ошибка загрузки трека:', error);
-                this.updateStatus(`Ошибка загрузки: ${track.title}`);
             }
         }
     }
@@ -240,11 +233,9 @@ class MP3Player {
                 this.elements.playBtn.style.display = 'none';
                 this.elements.pauseBtn.style.display = 'flex';
                 this.elements.albumCover.classList.add('playing');
-                this.updateStatus("Воспроизведение...");
             })
             .catch(error => {
                 console.error('Ошибка воспроизведения:', error);
-                this.updateStatus("Ошибка воспроизведения. Проверьте доступ к аудио файлу.");
             });
     }
     
@@ -254,7 +245,6 @@ class MP3Player {
         this.elements.playBtn.style.display = 'flex';
         this.elements.pauseBtn.style.display = 'none';
         this.elements.albumCover.classList.remove('playing');
-        this.updateStatus("Пауза");
     }
     
     prev() {
@@ -301,17 +291,10 @@ class MP3Player {
         return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
     
-    updateStatus(message) {
-        if (this.elements.statusMessage) {
-            this.elements.statusMessage.textContent = message;
-        }
-    }
-    
     // Метод для добавления треков динамически
     addTrack(track) {
         this.playlist.push(track);
         this.renderPlaylist();
-        this.updateStatus(`Добавлен трек: ${track.title}`);
     }
 }
 
