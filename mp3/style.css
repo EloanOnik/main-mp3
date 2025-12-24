@@ -148,36 +148,6 @@ body {
     font-size: 20px;
 }
 
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 25px;
-}
-
-.volume-control span {
-    color: #666;
-    font-size: 18px;
-}
-
-.volume-slider {
-    flex: 1;
-    height: 5px;
-    -webkit-appearance: none;
-    background: #e0e0e0;
-    border-radius: 3px;
-    outline: none;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #667eea;
-    cursor: pointer;
-}
-
 .playlist {
     list-style: none;
     max-height: 200px;

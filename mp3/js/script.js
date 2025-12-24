@@ -7,13 +7,12 @@ class MP3Player {
         this.shuffleMode = false;
         this.repeatMode = false;
         
-        // Элементы DOM
+        // Элементы DOM (УБИРАЕМ volumeSlider)
         this.elements = {
             playBtn: document.getElementById('play-btn'),
             pauseBtn: document.getElementById('pause-btn'),
             prevBtn: document.getElementById('prev-btn'),
             nextBtn: document.getElementById('next-btn'),
-            volumeSlider: document.getElementById('volume-slider'),
             progressBar: document.getElementById('progress-bar'),
             progressContainer: document.getElementById('progress-container'),
             currentTimeEl: document.getElementById('current-time'),
@@ -45,7 +44,6 @@ class MP3Player {
                 cover: "./tracks/track2/Не лечи.png",
                 duration: "2:25"
             },
-            
         ];
         
         // Инициализация событий
@@ -57,14 +55,13 @@ class MP3Player {
         // Загрузка первого трека
         this.loadTrack(0);
         
-        // Установка громкости
-        this.audio.volume = this.elements.volumeSlider.value;
+        // Устанавливаем фиксированную громкость (например, 70%)
+        this.audio.volume = 0.7;
         
-        // Инициализация фона (размытие)
+        // Инициализация фона
         this.initBackground();
     }
     
-    // НОВЫЙ МЕТОД: Инициализация фона с размытием
     initBackground() {
         // Удаляем старые оверлеи если есть
         const oldOverlay = document.getElementById('blur-overlay');
@@ -113,7 +110,6 @@ class MP3Player {
         }
     }
     
-    // НОВЫЙ МЕТОД: Обновление фона с анимацией
     updateBackground(imageUrl) {
         // Плавно скрываем старый фон
         const blurOverlay = document.getElementById('blur-overlay');
@@ -122,35 +118,23 @@ class MP3Player {
         if (blurOverlay) blurOverlay.style.opacity = '0.7';
         if (darkOverlay) darkOverlay.style.opacity = '0.8';
         
-        // Создаем временный элемент для предзагрузки
-        const img = new Image();
-        img.src = imageUrl;
+        // Устанавливаем новое фоновое изображение
+        document.body.style.backgroundImage = `url('${imageUrl}')`;
+        document.body.style.backgroundRepeat = 'no-repeat';
+        document.body.style.backgroundPosition = 'center center';
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundAttachment = 'fixed';
+        document.body.style.transition = 'background-image 0.8s ease-in-out';
         
-        img.onload = () => {
-            // Устанавливаем новое фоновое изображение
-            document.body.style.backgroundImage = `url('${imageUrl}')`;
-            document.body.style.backgroundRepeat = 'no-repeat';
-            document.body.style.backgroundPosition = 'center center';
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundAttachment = 'fixed';
-            document.body.style.transition = 'background-image 0.8s ease-in-out';
-            
-            // Плавно показываем оверлеи
-            setTimeout(() => {
-                if (blurOverlay) {
-                    blurOverlay.style.opacity = '1';
-                    blurOverlay.style.backdropFilter = 'blur(25px)';
-                    blurOverlay.style.webkitBackdropFilter = 'blur(25px)';
-                }
-                if (darkOverlay) darkOverlay.style.opacity = '1';
-            }, 100);
-        };
-        
-        img.onerror = () => {
-            console.warn('Не удалось загрузить изображение для фона:', imageUrl);
-            // Устанавливаем запасной фон
-            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        };
+        // Плавно показываем оверлеи
+        setTimeout(() => {
+            if (blurOverlay) {
+                blurOverlay.style.opacity = '1';
+                blurOverlay.style.backdropFilter = 'blur(25px)';
+                blurOverlay.style.webkitBackdropFilter = 'blur(25px)';
+            }
+            if (darkOverlay) darkOverlay.style.opacity = '1';
+        }, 100);
     }
     
     bindEvents() {
@@ -159,11 +143,6 @@ class MP3Player {
         this.elements.pauseBtn.addEventListener('click', () => this.pause());
         this.elements.prevBtn.addEventListener('click', () => this.prev());
         this.elements.nextBtn.addEventListener('click', () => this.next());
-        
-        // Громкость
-        this.elements.volumeSlider.addEventListener('input', (e) => {
-            this.audio.volume = e.target.value;
-        });
         
         // Прогресс трека
         this.elements.progressContainer.addEventListener('click', (e) => {
@@ -176,27 +155,6 @@ class MP3Player {
                 this.updateProgress();
             }
         });
-        
-        // Перетаскивание прогресс-бара
-        let isDragging = false;
-        this.elements.progressContainer.addEventListener('mousedown', () => isDragging = true);
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging && this.elements.progressContainer.contains(e.target)) {
-                const width = this.elements.progressContainer.clientWidth;
-                const rect = this.elements.progressContainer.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const duration = this.audio.duration;
-                
-                if (duration && !isNaN(duration)) {
-                    const newTime = (clickX / width) * duration;
-                    if (newTime >= 0 && newTime <= duration) {
-                        this.audio.currentTime = newTime;
-                        this.updateProgress();
-                    }
-                }
-            }
-        });
-        document.addEventListener('mouseup', () => isDragging = false);
         
         // События аудио
         this.audio.addEventListener('timeupdate', () => this.updateProgress());
@@ -262,7 +220,7 @@ class MP3Player {
                     item.classList.toggle('active', i === index);
                 });
                 
-                // Если был воспроизведение, продолжаем
+                // Если было воспроизведение, продолжаем
                 if (this.isPlaying) {
                     this.play();
                 }
@@ -302,7 +260,7 @@ class MP3Player {
     prev() {
         let newIndex = this.currentTrackIndex - 1;
         if (newIndex < 0) {
-            newIndex = this.playlist.length - 1; // Зацикливание
+            newIndex = this.playlist.length - 1;
         }
         this.loadTrack(newIndex);
         if (this.isPlaying) {
@@ -313,7 +271,7 @@ class MP3Player {
     next() {
         let newIndex = this.currentTrackIndex + 1;
         if (newIndex >= this.playlist.length) {
-            newIndex = 0; // Зацикливание
+            newIndex = 0;
         }
         this.loadTrack(newIndex);
         if (this.isPlaying) {
@@ -354,68 +312,11 @@ class MP3Player {
         this.playlist.push(track);
         this.renderPlaylist();
         this.updateStatus(`Добавлен трек: ${track.title}`);
-        
-        // Если это первый трек, обновляем фон
-        if (this.playlist.length === 1) {
-            this.updateBackground(track.cover);
-        }
-    }
-    
-    // Метод для загрузки локальных файлов
-    loadLocalFiles(filePaths) {
-        filePaths.forEach((path, index) => {
-            this.addTrack({
-                title: `Локальный файл ${index + 1}`,
-                artist: "Пользователь",
-                src: path,
-                cover: "./default-cover.jpg" // Добавьте картинку по умолчанию
-            });
-        });
-        
-        if (this.playlist.length > 0 && !this.audio.src) {
-            this.loadTrack(0);
-        }
-    }
-    
-    // НОВЫЙ МЕТОД: Изменение интенсивности размытия
-    setBlurIntensity(intensity) {
-        const blurOverlay = document.getElementById('blur-overlay');
-        if (blurOverlay) {
-            blurOverlay.style.backdropFilter = `blur(${intensity}px)`;
-            blurOverlay.style.webkitBackdropFilter = `blur(${intensity}px)`;
-        }
-    }
-    
-    // НОВЫЙ МЕТОД: Изменение прозрачности темного оверлея
-    setDarkness(opacity) {
-        const darkOverlay = document.getElementById('dark-overlay');
-        if (darkOverlay) {
-            darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
-        }
     }
 }
 
 // Инициализация плеера при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     const player = new MP3Player();
-    window.player = player; // Для отладки
-    
-    // Дополнительные треки для примера (раскомментируйте и настройте)
-    /*
-    player.addTrack({
-        title: "Название трека 2",
-        artist: "Исполнитель 2",
-        src: "./tracks/track2/song2.mp3",
-        cover: "./tracks/track2/cover2.png",
-        duration: "2:30"
-    });
-    
-    player.addTrack({
-        title: "Название трека 3",
-        artist: "Исполнитель 3",
-        src: "./tracks/track3/song3.mp3",
-        cover: "./tracks/track3/cover3.jpg",
-        duration: "3:15"
-    });
-    */
+    window.player = player;
 });
