@@ -1,0 +1,13 @@
+
+.card {
+    position: relative;
+    background: var(--card_background-light);
+    border-radius: 1rem;
+    box-shadow: var(--card_box_shadow-light);
+    padding: 1.25rem;
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}

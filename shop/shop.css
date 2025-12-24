@@ -1,0 +1,82 @@
+.p2 {
+    margin-bottom: 2.4rem;
+}
+
+.card {
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+}
+
+.card_wrapper {
+    display: flex;
+    justify-content: center; /* или space-between, если нужно растянуть */
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.avatar_bot {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid #0077ff;
+}
+
+body.dark-theme .avatar_bot{
+    border: var(--avatar-dark);
+}
+  
+.theme-toggle-container {
+    position: fixed; /* Фиксируем кнопку внизу */
+    bottom: 0; /* Размещаем кнопку у нижней части экрана */
+    left: 5%; /* Центрируем кнопку по горизонтали */
+    transform: translateX(-50%); /* Выравниваем точно по центру */
+    z-index: 100;
+    transition: all 0.3s ease;
+    margin-bottom: 1%;
+}
+
+
+@media (max-width: 1300px) {
+    .theme-toggle-container {
+        left: 4%;
+    }
+}
+
+@media (max-width: 780px) {
+    .theme-toggle-container {
+        left: 10%;
+    }
+}
+
+
+@media (max-width: 400px) {
+    .theme-toggle-container {
+        left: 7%;
+    }
+}
+
+@media (orientation: portrait) {
+    .theme-toggle-container {
+        margin-left: 0;
+        left: 10%; /* Для мобильных устройств можно уменьшить отступы */
+    }
+
+    #card_1 {
+        margin-bottom: 1rem;
+    }
+    
+    #card_2 {
+        margin-top: 1rem;
+    }
+}
+
+
+body.dark-theme .theme-toggle-container {
+    background-color: var(--button-dark);
+}
+
+
+
+

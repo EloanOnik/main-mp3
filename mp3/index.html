@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preload" href="./style.css" as="style">
+    <link rel="stylesheet" href="./style.css">
+
+    <title>MP3 Плеер</title>
+
+
+</head>
+<body>
+    <div class="player">
+        <div class="player-header">
+            <h2>Мои любимые треки</h2>
+        </div>
+        
+        <div class="album-cover" id="album-cover">
+            <img src="./tracks/track1/Посетитель снов.png" alt="Обложка альбома" id="cover-image">
+        </div>
+        
+        <div class="song-info">
+            <div class="song-title" id="current-song">Выберите трек</div>
+            <div class="song-artist" id="current-artist">—</div>
+        </div>
+        
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="time">
+            <span id="current-time">0:00</span>
+            <span id="duration">0:00</span>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn" id="prev-btn" title="Предыдущий">⏮</button>
+            <button class="control-btn play-btn" id="play-btn" title="Воспроизвести">▶</button>
+            <button class="control-btn play-btn" id="pause-btn" title="Пауза" style="display:none;">⏸</button>
+            <button class="control-btn" id="next-btn" title="Следующий">⏭</button>
+        </div>
+        
+        <div class="volume-control">
+            <span>🔈</span>
+            <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.01" value="0.7">
+            <span>🔊</span>
+        </div>
+        
+        <ul class="playlist" id="playlist">
+            <!-- Список песен будет добавляться через JS -->
+        </ul>
+        
+        <div class="status-message" id="status-message">
+        </div>
+    </div>
+
+    <script type="module" src="./js/script.js"></script>
+</body>
+</html>

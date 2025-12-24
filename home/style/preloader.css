@@ -1,0 +1,81 @@
+/* Основные стили прелоадера */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+/* Варианты градиентов */
+.preloader.gradient-1 {
+    background: linear-gradient(135deg, #ffcce6 0%, #d9b3ff 100%);
+}
+.preloader.gradient-2 {
+    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #ff8e53 100%);
+}
+.preloader.gradient-3 {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fbc2eb 100%);
+}
+.preloader.gradient-4 {
+    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+}
+
+/* Центральный контейнер */
+.preloader-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Стили текста */
+.preloader h1 {
+    padding: 20px;
+    color: white;
+    font-size: 3rem;
+    font-family: 'Arial', sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    animation: pulse 1.5s infinite;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 730px) {
+    .preloader h1 {
+        font-size: 1.8rem;
+    }
+}
+
+/* Стили для видео/стикера */
+.preload_video {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.preloader-media {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Анимация пульсации */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Основной контент */
+.content {
+    display: none;
+}
+

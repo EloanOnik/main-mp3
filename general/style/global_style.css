@@ -1,0 +1,119 @@
+* {
+    box-sizing: border-box;
+}
+
+/* Определяем цвета для светлой и темной темы */
+:root {
+    --background-light: #f4f4f4;
+    --background-dark: #121212;
+
+    --button-light: #000;
+    --button-dark: #fff;
+
+    --circle-light: #ffffff;
+    --circle-dark: #333333;
+
+    --card_box_shadow-light: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --card_box_shadow-dark: 0 4px 20px rgba(255, 255, 255, 0.1);
+    
+    --card_background-light: #fff;
+    --card_background-dark: #333;
+
+    --h1_color-dark: #fff;
+
+    --p_color-light: #666;
+    --p_color-dark: #f4f4f4;
+
+    --avatar-light: 3px solid #0077ff;
+    --avatar-dark: 3px solid #9B30FF;
+
+    --links-light: #0077ff;
+    --links-dark: #9B30FF;
+
+    --modal_background_color-light: rgba(0,0,0,0.5);
+    --modal_background_color-dark: rgba(255, 255, 255, 0.1);
+    
+    --modal_content_box_shadow-light: 0 4px 20px rgba(0, 0, 0, 0.2);
+    --modal_content_box_shadow-dark: 0 4px 20px rgba(255, 255, 255, 0.2);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: var(--background-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+body.dark-theme {
+    background-color: var(--background-dark);
+}
+
+body.dark-theme .card{
+    background: var(--card_background-dark);
+    box-shadow: var(--card_box_shadow-dark);
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: var(--avatar-light);
+    opacity: 0;
+    transition: opacity 0.3s;
+    object-fit: cover;
+}
+
+#avatar.loaded {
+    opacity: 1;
+}
+
+
+body.dark-theme .avatar {
+    border: var(--avatar-dark);
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+body.dark-theme h1 {
+    color: var(--h1_color-dark)
+}
+
+p {
+    color: var(--p_color-light);
+    margin: 10px 0 20px;
+}
+
+body.dark-theme p {
+    color: var(--p_color-dark)
+}
+
+.links a {
+    display: inline-block;
+    margin: 0 10px;
+    text-decoration: none;
+    color: var(--links-light);
+    font-weight: bold;
+}
+
+body.dark-theme .links a {
+    color: var(--links-dark)
+}
+
+
+@media (max-width: 730px) {
+    h1 {
+    font-size: 20px;
+    }
+    p {
+    font-size: 16px;
+    }
+}

@@ -1,0 +1,204 @@
+:root {
+    --gray-btn-light: #000;
+    --gray-btn-dark: #fefefe;
+    --tgme-page-extra-light: rgba(10, 10, 10, 0.4);
+    --tgme-page-extra-dark: rgba(250, 250, 250, 0.4);
+}
+
+body.dark-theme .background-blur, .background-blur {
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    filter: blur(20px) brightness(0.6); 
+    z-index: -1;
+}
+
+body.dark-theme .card, .card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+
+#qr-container {
+    position: relative;
+    width: 80%;
+    max-width: 300px;
+    margin: 10px auto;
+    aspect-ratio: 1/1;
+}
+
+#qr, #gradient-layer {
+    width: 100%;
+    height: 100%;
+}
+
+#gradient-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(0deg, #00f0ff, #ff00f0);
+    mask-size: cover;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+    -webkit-mask-repeat: no-repeat;
+    mask-image: none;
+    -webkit-mask-image: none;
+    transition: background-image 0.3s ease;
+}
+
+#qr {
+    display: none;
+}
+
+/* Стили для серой кнопки */
+.gray-btn {
+    position: absolute;
+    top: 5%;
+    right: 5%;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 8px;  /* Немного добавим padding для улучшения визуального восприятия */
+    border-radius: 50%;
+    color: var(--gray-btn-light);  /* Цвет текста и иконки */
+}
+
+body.dark-theme .gray-btn {
+    color: var(--gray-btn-dark)
+}
+
+/* Стили для модального окна */
+
+body.dark-theme .modal, .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--modal_background_color-light);
+    z-index: 1000;
+    overflow-y: auto; /* На случай, если контент больше экрана */
+}
+
+p {
+    color: rgba(20, 20, 20, 0.8)
+}
+
+.modal-content {
+    position: relative;
+    background-color: var(--modal_content_color-light);
+    margin: auto;
+    padding: 20px;
+    border-radius: 16px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: var(--modal_content_box_shadow-light);
+    
+    /* Вертикальное центрирование */
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+body.dark-theme .modal-content, .modal-content {
+    background:
+    rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    
+}
+
+
+/* Кнопка закрытия */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+        top: 20px;
+        transform: none;
+        margin-bottom: 20px;
+    }
+    
+    #qr-container {
+        width: 100%;
+    }
+}
+
+.close:hover {
+    color: black;
+}
+
+.gray-btn .material-symbols-outlined {
+    font-size: 24px; /* Уменьшаем размер иконки */
+    display: block; /* Чтобы иконка занимала всю кнопку */
+}
+
+.icon-circle {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.icon-circle svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+  
+.icon-circle:hover {
+    background-color: rgba(0, 0, 0, 0.125);
+    transform: scale(1.05);
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.typewriter::after {
+    content: "|";
+    animation: blink 0.7s steps(1) infinite;
+    margin-left: 2px;
+    color: white;
+}
+
+#auto_text {
+  white-space: pre-line;
+}
+
+.tgme_page_extra {
+    font-size: 15px;
+    line-height: 18px;
+    text-align: center;
+    padding: 6px 16px 0;
+    color: var(--tgme-page-extra-light);
+}
+
+body.dark-theme .tgme_page_extra {
+    color: var(--tgme-page-extra-dark);
+}
+/*
+@media (max-width: 730px) {
+    .card {
+        padding: 1rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+}
+*/

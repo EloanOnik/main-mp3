@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="module" src="../general/js/theme.js"></script>
+
+    <link rel="preload" href="../general/style/global_style.css" as="style">
+    <link rel="stylesheet" href="../general/style/global_style.css">
+    <link rel="preload" href="../general/style/card.css" as="style">
+    <link rel="stylesheet" href="../general/style/card.css">
+    <link rel="preload" href="../general/style/theme_style.css" as="style">
+    <link rel="stylesheet" href="../general/style/theme_style.css">
+    <link rel="preload" href="../general/style/hamburger_menu.css" as="style">
+    <link rel="stylesheet" href="../general/style/hamburger_menu.css">
+    <link rel="preload" href="../shop/shop.css" as="style">
+    <link rel="stylesheet" href="../shop/shop.css">
+    <title>Shop</title>
+</head>
+<body>
+    <div class="hamburger-menu">
+        <input id="menu__toggle" type="checkbox" />
+        <label class="menu__btn" for="menu__toggle">
+          <span></span>
+        </label>
+
+        <ul class="menu__box">
+          <li><a class="menu__item" href="/">Home</a></li>
+          <li><a class="menu__item" href="https://github.com/EloanOnik">GitHub</a></li>
+        </ul>
+
+        <div class="theme-toggle-container" id="theme-toggle-container">
+            <button id="theme-toggle" class="theme-toggle" >
+              <div class="circle"></div>
+            </button>
+        </div>
+
+    </div>
+
+
+
+    <div class="card_wrapper">
+        <div class="card" id="card_1"> 
+            <img src="../shop/bot_avatar.png" alt="Аватар" class="avatar_bot" id="avatar_bot">
+            <h1>Тг-бот</h1>
+            <p class="p1">Телеграм-боты, средней сложности </p>
+            <div class="links">
+                <a href="https://t.me/onikeloyan" target="_blank">Связатся</a>
+            <!-- Добавь ещё ссылки -->
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module" src="../shop/theme_logic.js"></script>
+    <script type="module" src="../home/js/favicon.js"></script>
+
+
+
+</body>
+</html>

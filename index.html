@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body:not(.loaded) {
+        opacity: 0;
+        visibility: hidden;
+        overflow: hidden;
+    }
+    body.loaded {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s ease;
+    }
+  </style>
+
+  <link rel="preload" href="./home/style/preloader.css" as="style">
+  <link rel="stylesheet" href="./home/style/preloader.css">
+  <link rel="preload" href="./general/style/global_style.css" as="style">
+  <link rel="stylesheet" href="./general/style/global_style.css">
+  <link rel="preload" href="./general/style/card.css" as="style">
+  <link rel="stylesheet" href="./general/style/card.css">
+  <link rel="preload" href="./general/style/theme_style.css" as="style">
+  <link rel="stylesheet" href="./general/style/theme_style.css">
+  <link rel="preload" href="./home/style/styles.css" as="style">
+  <link rel="stylesheet" href="./home/style/styles.css">
+  <script src="./qr/qr-code.js"></script>
+
+  <title>Моя визитка</title>
+
+</head>
+<body>
+
+  <div class="background-blur"></div>
+
+
+  <div class="preloader">
+      <div class="preloader-center">
+          <h1>Улыбайся чаще, милашка</h1>
+          <div class="preload_video">
+              <video autoplay loop muted class="preloader-media">
+                <source src="./home/media/sticers.mp4">
+              </video>
+          </div>
+      </div>
+  </div>
+
+  <div class="content"></div>
+  <div class="card">
+    <!-- Серая кнопка, которая открывает модальное окно -->
+    <a href="#" class="gray-btn" id="modalBtn" aria-label="Показать QR">
+      <div class="icon-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8 0h8v8h-8V5zm2 2v4h4V7h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8 0h2v2h-2v-2zm4 0h4v2h-4v-2zm-4 4h2v2h-2v-2zm4 0h2v2h-2v-2z"/>
+        </svg>
+      </div>
+    </a>
+
+    <div class="theme-toggle-container">
+      <button id="theme-toggle" class="theme-toggle">
+        <div class="circle"></div>
+      </button>
+    </div>
+    
+    <img src="https://t.me/i/userpic/320/onikeloyan.jpg" alt="Аватар" class="avatar" id="avatar">
+    <h1>Хочу кушать 🍣</h1>
+    <div class="tgme_page_extra">@onikeloyan</div>
+    <div id="#">
+      <p id="auto_text" class="auto_text"></p> 
+    </div>
+    <div class="links">
+      <a href="https://t.me/onikeloyan" target="_blank">Telegram</a>
+      <a href="./shop/">Shop</a>
+      <a href="./mp3/">Mp3</a>
+      <a href="https://github.com/EloanOnik" target="_blank">GitHub</a>
+      
+      <!-- Добавь ещё ссылки -->
+    </div>
+  </div>
+      <!-- Модальное окно -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="qr-container">
+          <div id="qr"></div>
+          <div id="gradient-layer"></div>
+        </div>
+    </div>
+  </div>
+  <script type="module" src="./home/js/qr.js"></script>
+
+  <script type="module" src="./home/js/preloader.js"></script>
+  <script type="module" src="./home/js/avatar.js"></script>
+  <script type="module" src="./home/js/blur.js"></script>
+  <script type="module" src="./home/js/favicon.js"></script>
+  <script type="module" src="./general/js/theme.js"></script>
+  <script type="module" src="./home/js/auto_text.js"></script>
+</body>
+</html>
