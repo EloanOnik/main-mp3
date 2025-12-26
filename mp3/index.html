@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preload" href="./style.css" as="style">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="preload" href="./style/style.css" as="style">
+    <link rel="stylesheet" href="./style/style.css">
+    <link rel="preload" href="../general/style/theme_style.css" as="style">
+    <link rel="stylesheet" href="../general/style/theme_style.css">
 
     <title>MP3 Плеер</title>
 
@@ -16,6 +18,12 @@
     <div class="player">
         <div class="player-header">
             <h2>Мои любимые треки</h2>
+        </div>
+
+        <div class="theme-toggle-container">
+        <button id="theme-toggle" class="theme-toggle">
+            <div class="circle"></div>
+        </button>
         </div>
         
         <div class="album-cover" id="album-cover">
@@ -49,5 +57,6 @@
     </div>
 
     <script type="module" src="./js/script.js"></script>
+    <script type="module" src="../general/js/theme.js"></script>
 </body>
 </html>

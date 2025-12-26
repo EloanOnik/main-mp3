@@ -6,6 +6,32 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+    --player-light: rgba(255, 255, 255, 0.95);
+    --player-dark: #111;
+
+    --player-header-h2-light: #333;
+    --player-header-h2-dark: #fff;
+
+    --song-title-light: #333;
+    --song-title-dark: rgba(255, 255, 255, 0.8);
+
+    --song-artist-light: #666;
+    --song-artist-dark: rgba(255, 255, 255, 0.6);
+
+    --playlist-light: #f8f9fa;
+    --playlist-dark: #222;
+
+    --track-title-light: #333;
+    --track-title-dark: rgba(255, 255, 255, 0.8);
+
+    --track-artist-light: #666;
+    --track-artist-dark: rgba(255, 255, 255, 0.6);
+
+    --playlist-li-hover-light: #edf2ff;
+    --playlist-li-hover-dark: #333;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     /* УБИРАЕМ градиент - он будет устанавливаться через JS */
@@ -28,11 +54,15 @@ body {
     width: 100%;
     padding: 30px;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--player-light);
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
     backdrop-filter: blur(10px);
     position: relative;
     z-index: 10;
+}
+
+body.dark-theme .player {
+    background: var(--player-dark);
 }
 
 .player-header {
@@ -41,9 +71,13 @@ body {
 }
 
 .player-header h2 {
-    color: #333;
+    color: var(--player-header-h2-light);
     font-size: 24px;
     margin-bottom: 5px;
+}
+
+body.dark-theme .player-header h2 {
+    color: var(--player-header-h2-dark) 
 }
 
 .player-header p {
@@ -85,13 +119,21 @@ body {
 .song-title {
     font-size: 22px;
     font-weight: 600;
-    color: #333;
+    color: var(--song-title-light);
     margin-bottom: 5px;
+}
+
+body.dark-theme .song-title {
+    color: var(--song-title-dark);
 }
 
 .song-artist {
     font-size: 16px;
-    color: #666;
+    color: var(--song-artist-light);
+}
+
+body.dark-theme .song-artist {
+    color: var(--song-artist-dark)
 }
 
 .progress-container {
@@ -164,8 +206,12 @@ body {
     max-height: 200px;
     overflow-y: auto;
     border-radius: 10px;
-    background: #f8f9fa;
+    background: var(--playlist-light);
     padding: 10px;
+}
+
+body.dark-theme .playlist {
+    background: var(--playlist-dark);
 }
 
 .playlist::-webkit-scrollbar {
@@ -197,8 +243,12 @@ body {
 }
 
 .playlist li:hover {
-    background: #edf2ff;
+    background: var(--playlist-li-hover-dark);
     padding-left: 20px;
+}
+
+body.dark-theme .playlist li:hover{
+    background: var(--playlist-li-hover-dark);
 }
 
 .playlist li.active {
@@ -214,18 +264,29 @@ body {
 
 .track-title {
     font-weight: 500;
-    color: #333;
+    color: var(--track-title-light);
+}
+
+body.dark-theme .track-title {
+    color:  var(--track-title-dark);
 }
 
 .track-artist {
     font-size: 12px;
-    color: #666;
+    color: var(--track-artist-light);
+}
+
+body.dark-theme .track-artist {
+    color: var(--track-artist-dark);
 }
 
 .track-duration {
     font-size: 12px;
     color: #999;
 }
+
+
+
 
 @media (max-width: 480px) {
     .player {
