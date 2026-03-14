@@ -53,3 +53,35 @@ body.dark-theme .circle {
 .home_links {
     padding-top: 3%;
 }
+
+.theme-toggle {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.theme-toggle:focus,
+.theme-toggle:focus-visible,
+.theme-toggle:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Для контейнера тоже */
+.theme-toggle-container {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.theme-toggle-container:focus,
+.theme-toggle-container:focus-visible,
+.theme-toggle-container:active {
+    outline: none !important;
+}
+
+/* Для серой кнопки QR */
+.gray-btn:focus,
+.gray-btn:focus-visible,
+.gray-btn:active {
+    outline: none !important;
+}
